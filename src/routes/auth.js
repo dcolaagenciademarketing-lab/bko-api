@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { exec } = require('child_process');
 const prisma = require('../lib/prisma');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -49,6 +50,17 @@ router.post('/login', async (req, res) => {
             details: err.message // Mostrando o erro real para o usuário identificar o problema
         });
     }
+});
+
+// Rota temporária para FORÇAR a sincronização do banco se o Render estiver ignorando o comando de start
+router.get('/debug-sync', async (req, res) => {
+    exec('npx prisma generate && npx prisma db push --accept-data-loss && node prisma/seed.js', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Exec error: ${error}`);
+            return res.status(500).json({ error: error.message, stderr });
+        }
+        res.json({ message: "Sincronização forçada com sucesso!", stdout, stderr });
+    });
 });
 
 module.exports = router;
