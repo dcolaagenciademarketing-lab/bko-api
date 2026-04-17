@@ -46,7 +46,7 @@ router.post('/login', async (req, res) => {
         console.error('Erro na rota /login:', err);
         return res.status(500).json({
             error: 'Erro interno no servidor',
-            details: process.env.NODE_ENV === 'development' ? err.message : undefined
+            details: err.message // Mostrando o erro real para o usuário identificar o problema
         });
     }
 });
